@@ -3,8 +3,12 @@ from config import RESTAURANT_DATA
 # --- Moduli di Azione per ogni Intento ---
 
 def chiedere_informazioni(entities: dict, conversation_state: dict) -> str:
-    # Per ora, risponde con dati statici. In futuro, potremmo differenziare
-    # la risposta in base alle entità (es. se chiede solo l'indirizzo).
+    richiesta_specifica = (entities or {}).get("richiesta_specifica")
+    if richiesta_specifica == "indirizzo":
+        return f"{RESTAURANT_DATA['address']}"
+    if richiesta_specifica == "orari":
+        return f"{RESTAURANT_DATA['opening_hours']}"
+    # fallback conservativo: fornisce solo le info disponibili senza inventare
     return f"{RESTAURANT_DATA['opening_hours']} {RESTAURANT_DATA['address']}"
 
 def creare_prenotazione(entities: dict, conversation_state: dict) -> str:

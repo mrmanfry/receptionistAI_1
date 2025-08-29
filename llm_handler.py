@@ -40,12 +40,14 @@ def analyze_text_with_gemini(text: str, restaurant_data: dict) -> (str, dict):
 
         Il tuo compito è:
         1. Identificare l'intento principale dell'utente. Gli intenti validi sono: {", ".join(KNOWN_INTENTS)}.
-        2. Estrarre le entità. Le entità valide sono: 'numero_persone', 'data', 'orario'.
+        2. Estrarre le entità. Le entità valide sono: 'numero_persone', 'data', 'orario', e 'richiesta_specifica' (valori ammessi: 'indirizzo'|'orari').
         3. Se l'intento è 'chiedere_informazioni', basa la tua risposta ESCLUSIVAMENTE sulle informazioni fornite nel "Contesto del Ristorante".
         4. NON DEVI ASSOLUTAMENTE inventare o aggiungere informazioni non presenti nel contesto (es. fermate della metropolitana, parcheggi, etc.). Se la domanda riguarda informazioni non presenti nel contesto, l'intento deve essere 'richiesta_incomprensibile'.
 
-        Restituisci la tua analisi esclusivamente in formato JSON, con la seguente struttura precisa:
-        {"intento": "nome_intento", "entita": {"nome_entita": "valore_entita"}}
+        Restituisci la tua analisi esclusivamente in formato JSON valido, con la seguente struttura precisa e senza testo extra:
+        {"intento": "nome_intento", "entita": {"numero_persone": "..", "data": "..", "orario": "..", "richiesta_specifica": "indirizzo|orari"}}
+
+        Il tuo unico e solo output deve essere un oggetto JSON valido. Non generare mai testo conversazionale o spiegazioni al di fuori dell'oggetto JSON.
     """
 
     config = GenerationConfig(
