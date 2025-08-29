@@ -11,32 +11,46 @@ vertexai.init(project=PROJECT_ID, location=LOCATION)
 
 # Gli unici "compiti" che il nostro cervello MVP sa eseguire
 KNOWN_INTENTS = [
-    "creare_prenotazione", 
-    "chiedere_informazioni", 
+    "creare_prenotazione",
+    "chiedere_informazioni",
     "notificare_ritardo",
     "salutare",
-    "richiesta_incomprensibile"
+    "richiesta_incomprensibile",
 ]
 
-def analyze_text_with_gemini(text: str) -> (str, dict):
+
+def analyze_text_with_gemini(text: str, restaurant_data: dict) -> (str, dict):
     """
-    Interroga il modello Gemini per estrarre intento ed entità.
+    Interroga il modello Gemini per estrarre intento ed entità, usando i dati
+    forniti come unica fonte di verità per evitare allucinazioni.
     """
     model = GenerativeModel("gemini-1.5-flash-001")
-    
-    prompt = f"""
-        Analizza la seguente frase di un utente che ha chiamato un ristorante italiano: "{text}"
-        Il tuo compito è identificare l'intento principale e estrarre le entità.
-        Gli intenti validi sono: {", ".join(KNOWN_INTENTS)}.
-        Le entità valide sono: 'numero_persone', 'data', 'orario'.
-        Restituisci la tua analisi esclusivamente in formato JSON, con la seguente struttura:
-        {{"intento": "nome_intento", "entita": {{"nome_entita": "valore_entita"}}}}
-        Se non riesci a identificare un intento valido, usa "richiesta_incomprensibile".
+
+    context = f"""
+    Contesto del Ristorante:
+    - Nome: {restaurant_data.get('name')}
+    - Orari: {restaurant_data.get('opening_hours')}
+    - Indirizzo: {restaurant_data.get('address')}
     """
-    
+
+    prompt = f"""
+        {context}
+
+        Analizza la seguente frase di un utente: "{text}"
+
+        Il tuo compito è:
+        1. Identificare l'intento principale dell'utente. Gli intenti validi sono: {", ".join(KNOWN_INTENTS)}.
+        2. Estrarre le entità. Le entità valide sono: 'numero_persone', 'data', 'orario'.
+        3. Se l'intento è 'chiedere_informazioni', basa la tua risposta ESCLUSIVAMENTE sulle informazioni fornite nel "Contesto del Ristorante".
+        4. NON DEVI ASSOLUTAMENTE inventare o aggiungere informazioni non presenti nel contesto (es. fermate della metropolitana, parcheggi, etc.). Se la domanda riguarda informazioni non presenti nel contesto, l'intento deve essere 'richiesta_incomprensibile'.
+
+        Restituisci la tua analisi esclusivamente in formato JSON, con la seguente struttura precisa:
+        {"intento": "nome_intento", "entita": {"nome_entita": "valore_entita"}}
+    """
+
     config = GenerationConfig(
         temperature=0.0,
-        response_mime_type="application/json"
+        response_mime_type="application/json",
     )
 
     try:

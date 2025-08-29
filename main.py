@@ -2,6 +2,7 @@ import functions_framework
 from flask import jsonify
 import llm_handler
 import intent_handlers
+from config import RESTAURANT_DATA
 
 @functions_framework.http
 def handle_call(request):
@@ -15,8 +16,9 @@ def handle_call(request):
         # In futuro, lo riceveremo da Retell ad ogni turno
         conversation_state = request_json.get('state', {})
 
-        # 1. CAPIRE: Chiamiamo il modulo LLM per l'analisi
-        intent, entities = llm_handler.analyze_text_with_gemini(transcribed_text)
+        # 1. CAPIRE: Chiamiamo il modulo LLM per l'analisi con grounding sui dati del ristorante
+        dati_ristorante_corrente = RESTAURANT_DATA
+        intent, entities = llm_handler.analyze_text_with_gemini(transcribed_text, dati_ristorante_corrente)
         
         # 2. DECIDERE: Troviamo la funzione giusta da eseguire in base all'intento
         handler_function = getattr(intent_handlers, intent, intent_handlers.richiesta_incomprensibile)
