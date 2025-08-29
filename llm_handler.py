@@ -4,7 +4,8 @@ import json
 import os
 
 # Inizializzazione di Vertex AI
-PROJECT_ID = os.environ.get("GCP_PROJECT", "default-project") # Aggiunto un default per test locali
+# Forziamo l'uso dell'ID progetto corretto per evitare ambiguità
+PROJECT_ID = "receptionistai-478428"
 LOCATION = "europe-west1"
 vertexai.init(project=PROJECT_ID, location=LOCATION)
 
