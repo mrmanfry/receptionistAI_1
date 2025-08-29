@@ -24,7 +24,7 @@ def analyze_text_with_gemini(text: str, restaurant_data: dict) -> (str, dict):
     Interroga il modello Gemini per estrarre intento ed entità, usando i dati
     forniti come unica fonte di verità per evitare allucinazioni.
     """
-    model = GenerativeModel("gemini-1.5-flash-001")
+    model = GenerativeModel("gemini-1.5-flash-002")
 
     context = f"""
     Contesto del Ristorante:
