@@ -3,11 +3,13 @@ from vertexai.generative_models import GenerativeModel, GenerationConfig
 import json
 import os
 
-# Inizializzazione di Vertex AI
-# Forziamo l'uso dell'ID progetto corretto per evitare ambiguità
-PROJECT_ID = "receptionistai-470420"
-LOCATION = "europe-west1"
+# Inizializzazione di Vertex AI (configurabile via env)
+PROJECT_ID = os.environ.get("GCP_PROJECT", "receptionistai-470420")
+LOCATION = os.environ.get("GCP_LOCATION", "europe-west1")
 vertexai.init(project=PROJECT_ID, location=LOCATION)
+
+# Modello configurabile via env per gestire disponibilità per regione
+MODEL_NAME = os.environ.get("MODEL_NAME", "gemini-1.5-flash")
 
 # Gli unici "compiti" che il nostro cervello MVP sa eseguire
 KNOWN_INTENTS = [
@@ -24,7 +26,7 @@ def analyze_text_with_gemini(text: str, restaurant_data: dict) -> (str, dict):
     Interroga il modello Gemini per estrarre intento ed entità, usando i dati
     forniti come unica fonte di verità per evitare allucinazioni.
     """
-    model = GenerativeModel("gemini-1.5-flash-002")
+    model = GenerativeModel(MODEL_NAME)
 
     context = f"""
     Contesto del Ristorante:
