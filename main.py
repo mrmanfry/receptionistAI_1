@@ -11,11 +11,16 @@ def handle_call(request):
     Questo è il nostro "cervello orchestratore".
     """
     try:
-        request_json = request.get_json(silent=True)
-        transcribed_text = request_json.get('transcript', '')
+        # Log richiesta in entrata
+        incoming_data = request.get_json(silent=True)
+        print("--- DATI RICEVUTI DA RETELL AI ---")
+        import json as _json
+        print(_json.dumps(incoming_data, indent=2))
+        print("-----------------------------------")
+        transcribed_text = (incoming_data or {}).get('transcript', '')
         # Per ora lo stato della conversazione è un dizionario vuoto
         # In futuro, lo riceveremo da Retell ad ogni turno
-        conversation_state = request_json.get('state', {})
+        conversation_state = (incoming_data or {}).get('state', {})
 
         # 1. CAPIRE: Chiamiamo il modulo LLM per l'analisi con grounding sui dati del ristorante
         dati_ristorante_corrente = RESTAURANT_DATA
@@ -34,8 +39,8 @@ def handle_call(request):
         }
 
         print("--- OUTPUT INVIATO A RETELL AI ---")
-        import json as _json_alias
-        print(_json_alias.dumps(response_data, indent=2))
+        import json as _json
+        print(_json.dumps(response_data, indent=2))
         print("------------------------------------")
         return jsonify(response_data), 200
 
