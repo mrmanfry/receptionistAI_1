@@ -5,7 +5,7 @@ import os
 
 # Inizializzazione di Vertex AI
 # Forziamo l'uso dell'ID progetto corretto per evitare ambiguità
-PROJECT_ID = "receptionistai-478428"
+PROJECT_ID = "receptionistai-470420"
 LOCATION = "europe-west1"
 vertexai.init(project=PROJECT_ID, location=LOCATION)
 
