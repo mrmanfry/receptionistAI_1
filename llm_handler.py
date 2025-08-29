@@ -33,6 +33,12 @@ def analyze_text_with_gemini(text: str, restaurant_data: dict) -> (str, dict):
     - Indirizzo: {restaurant_data.get('address')}
     """
 
+    # Esempio JSON separato per evitare errori di formattazione nelle f-string
+    json_structure_example = (
+        '{"intento": "nome_intento", '
+        '"entita": {"numero_persone": "..", "data": "..", "orario": "..", "richiesta_specifica": "indirizzo|orari"}}'
+    )
+
     prompt = f"""
         {context}
 
@@ -42,10 +48,10 @@ def analyze_text_with_gemini(text: str, restaurant_data: dict) -> (str, dict):
         1. Identificare l'intento principale dell'utente. Gli intenti validi sono: {", ".join(KNOWN_INTENTS)}.
         2. Estrarre le entità. Le entità valide sono: 'numero_persone', 'data', 'orario', e 'richiesta_specifica' (valori ammessi: 'indirizzo'|'orari').
         3. Se l'intento è 'chiedere_informazioni', basa la tua risposta ESCLUSIVAMENTE sulle informazioni fornite nel "Contesto del Ristorante".
-        4. NON DEVI ASSOLUTAMENTE inventare o aggiungere informazioni non presenti nel contesto (es. fermate della metropolitana, parcheggi, etc.). Se la domanda riguarda informazioni non presenti nel contesto, l'intento deve essere 'richiesta_incomprensibile'.
+        4. NON DEVI ASSOLUTAMENTE inventare o aggiungere informazioni non presenti nel contesto. Se la domanda riguarda informazioni non presenti nel contesto, l'intento deve essere 'richiesta_incomprensibile'.
 
         Restituisci la tua analisi esclusivamente in formato JSON valido, con la seguente struttura precisa e senza testo extra:
-        {"intento": "nome_intento", "entita": {"numero_persone": "..", "data": "..", "orario": "..", "richiesta_specifica": "indirizzo|orari"}}
+        {json_structure_example}
 
         Il tuo unico e solo output deve essere un oggetto JSON valido. Non generare mai testo conversazionale o spiegazioni al di fuori dell'oggetto JSON.
     """
