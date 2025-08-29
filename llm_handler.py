@@ -42,20 +42,22 @@ def analyze_text_with_gemini(text: str, restaurant_data: dict) -> (str, dict):
     )
 
     prompt = f"""
+        Sei un analista di linguaggio naturale super-efficiente per il centralino di un ristorante.
+        Il tuo unico compito è analizzare la frase dell'utente e restituire la tua analisi in un formato JSON pulito.
+        Il contesto con le informazioni certe del ristorante è il seguente:
         {context}
 
-        Analizza la seguente frase di un utente: "{text}"
+        Analizza questa frase dell'utente: "{text}"
 
-        Il tuo compito è:
-        1. Identificare l'intento principale dell'utente. Gli intenti validi sono: {", ".join(KNOWN_INTENTS)}.
-        2. Estrarre le entità. Le entità valide sono: 'numero_persone', 'data', 'orario', e 'richiesta_specifica' (valori ammessi: 'indirizzo'|'orari').
-        3. Se l'intento è 'chiedere_informazioni', basa la tua risposta ESCLUSIVAMENTE sulle informazioni fornite nel "Contesto del Ristorante".
-        4. NON DEVI ASSOLUTAMENTE inventare o aggiungere informazioni non presenti nel contesto. Se la domanda riguarda informazioni non presenti nel contesto, l'intento deve essere 'richiesta_incomprensibile'.
+        Segui queste regole in modo ferreo:
+        1. Identifica l'intento tra i seguenti valori: {", ".join(KNOWN_INTENTS)}.
+        2. Estrai le entità rilevanti. Le chiavi valide sono: 'numero_persone', 'data', 'orario', 'richiesta_specifica'.
+        3. Per 'richiesta_specifica', i valori possibili sono solo 'indirizzo' o 'orari'.
+        4. Se la richiesta dell'utente è ambigua, non rientra negli intenti, o chiede informazioni non presenti nel contesto, DEVI usare l'intento 'richiesta_incomprensibile'.
+        5. Il tuo output deve essere solo e soltanto l'oggetto JSON. Non includere mai commenti, spiegazioni o testo conversazionale.
 
-        Restituisci la tua analisi esclusivamente in formato JSON valido, con la seguente struttura precisa e senza testo extra:
+        JSON Output:
         {json_structure_example}
-
-        Il tuo unico e solo output deve essere un oggetto JSON valido. Non generare mai testo conversazionale o spiegazioni al di fuori dell'oggetto JSON.
     """
 
     config = GenerationConfig(
