@@ -35,30 +35,22 @@ def analyze_text_with_gemini(text: str, restaurant_data: dict) -> (str, dict):
     - Indirizzo: {restaurant_data.get('address')}
     """
 
-    # Esempio JSON separato per evitare errori di formattazione nelle f-string
-    json_structure_example = (
-        '{"intento": "nome_intento", '
-        '"entita": {"numero_persone": "..", "data": "..", "orario": "..", "richiesta_specifica": "indirizzo|orari"}}'
-    )
+    # Prompt few-shot ottimizzato
+    prompt = f"""Analizza la richiesta dell'utente per un ristorante e classifica l'intento.
 
-    prompt = f"""
-        Sei un analista di linguaggio naturale super-efficiente per il centralino di un ristorante.
-        Il tuo unico compito è analizzare la frase dell'utente e restituire la tua analisi in un formato JSON pulito.
-        Il contesto con le informazioni certe del ristorante è il seguente:
-        {context}
+CONTESTO RISTORANTE:
+{context}
 
-        Analizza questa frase dell'utente: "{text}"
+ESEMPI DI CLASSIFICAZIONE:
+- "avete posto per due stasera?" → {{"intento": "creare_prenotazione", "entita": {{"numero_persone": "2", "data": "stasera"}}}}
+- "dove siete?" / "dove vi trovate?" / "qual è il vostro indirizzo?" → {{"intento": "chiedere_informazioni", "entita": {{"richiesta_specifica": "indirizzo"}}}}
+- "che orari fate?" / "siete aperti?" / "a che ora aprite?" → {{"intento": "chiedere_informazioni", "entita": {{"richiesta_specifica": "orari"}}}}
+- "posso parlare col proprietario?" / "chi è il responsabile?" → {{"intento": "richiesta_incomprensibile", "entita": {{}}}}
 
-        Segui queste regole in modo ferreo:
-        1. Identifica l'intento tra i seguenti valori: {", ".join(KNOWN_INTENTS)}.
-        2. Estrai le entità rilevanti. Le chiavi valide sono: 'numero_persone', 'data', 'orario', 'richiesta_specifica'.
-        3. Per 'richiesta_specifica', i valori possibili sono solo 'indirizzo' o 'orari'.
-        4. Se la richiesta dell'utente è ambigua, non rientra negli intenti, o chiede informazioni non presenti nel contesto, DEVI usare l'intento 'richiesta_incomprensibile'.
-        5. Il tuo output deve essere solo e soltanto l'oggetto JSON. Non includere mai commenti, spiegazioni o testo conversazionale.
+FRASE DA ANALIZZARE: "{text}"
 
-        JSON Output:
-        {json_structure_example}
-    """
+Restituisci SOLO il JSON con intento ed entità.
+"""
 
     config = GenerationConfig(
         temperature=0.0,
