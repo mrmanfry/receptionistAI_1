@@ -3,6 +3,7 @@ from flask import jsonify
 import llm_handler
 import intent_handlers
 from config import RESTAURANT_DATA
+import json
 
 @functions_framework.http
 def handle_call(request):
@@ -31,6 +32,11 @@ def handle_call(request):
             "response_text": response_text,
             "state": conversation_state
         }
+
+        print("--- OUTPUT INVIATO A RETELL AI ---")
+        import json as _json_alias
+        print(_json_alias.dumps(response_data, indent=2))
+        print("------------------------------------")
         return jsonify(response_data), 200
 
     except Exception as e:
